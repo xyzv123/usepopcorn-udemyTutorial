@@ -1,13 +1,5 @@
-import ListBox from "./ListBox";
-import WatchedBox from "./WatchedBox";
-
-function MainMenu() {
-  return (
-    <main className="main">
-      <ListBox />
-      <WatchedBox />
-    </main>
-  );
+function MainMenu({ children }) {
+  return <main className="main">{children}</main>;
 }
 
 export default MainMenu;
