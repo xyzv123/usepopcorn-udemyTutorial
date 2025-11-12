@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MainMenu from "./components/MainMenu";
 import Navbar from "./components/Navbar";
 import Logo from "./components/Logo";
@@ -56,9 +56,17 @@ const tempWatchedData = [
   },
 ];
 
+const KEY = "bd04e39d";
+
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
+
+  useEffect(function () {
+    fetch(`http://www.omdbapi.com/?apikey=${KEY}&`).then((res) =>
+      res.json().then((data) => setMovies(data.Search))
+    );
+  }, []);
 
   return (
     <>
