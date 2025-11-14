@@ -8,6 +8,8 @@ import MovieList from "./components/MovieList";
 import Box from "./components/Box";
 import WatchedSummary from "./components/WatchedSummary";
 import WatchedMoviesList from "./components/WatchedMoviesList";
+import Loader from "./components/Loader";
+import ErrorMessage from "./components/ErrorMessage";
 
 const tempMovieData = [
   {
@@ -61,23 +63,50 @@ const KEY = "bd04e39d";
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const tempQuery = "interstellar";
+  const [query, setQuery] = useState("");
 
   useEffect(function () {
-    fetch(`http://www.omdbapi.com/?apikey=${KEY}&`).then((res) =>
-      res.json().then((data) => setMovies(data.Search))
-    );
+    async function fetchMovies() {
+      try {
+        setIsLoading(true);
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${tempQuery}`
+        );
+        if (!res.ok)
+          throw new Error("something went wrong with fetching movies");
+        const data = await res.json();
+
+        if (data.Response === "False") throw new Error("movie not found");
+
+        setMovies(data.Search);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchMovies();
   }, []);
 
   return (
     <>
       <Navbar>
         <Logo />
-        <Search />
+        <Search query={query} setQuery={setQuery} />
         <NumResults movies={movies} />
       </Navbar>
       <MainMenu>
         <Box>
-          <MovieList movies={movies} />
+          {isLoading ? (
+            <Loader />
+          ) : error ? (
+            <ErrorMessage message={error} />
+          ) : (
+            <MovieList movies={movies} />
+          )}
         </Box>
         <Box>
           <WatchedSummary watched={watched} />
