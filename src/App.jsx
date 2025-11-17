@@ -37,6 +37,10 @@ export default function App() {
     handleCloseMovieDetails();
   }
 
+  function handleDeleteWatched(id) {
+    setWatched((watched) => watched.filter((x) => x.imdbID !== id));
+  }
+
   useEffect(
     function () {
       async function fetchMovies() {
@@ -99,7 +103,10 @@ export default function App() {
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedMoviesList watched={watched} />
+              <WatchedMoviesList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
             </>
           )}
         </Box>
