@@ -4,9 +4,28 @@ import Loader from "./Loader";
 
 const KEY = "bd04e39d";
 
-function MovieDetails({ selectedId, onCloseMovieDetails }) {
+function MovieDetails({
+  selectedId,
+  onCloseMovieDetails,
+  onAddWatched,
+  watched,
+}) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [userRating, setUseRating] = useState("");
+
+  function handleAdd() {
+    const newWatchedMovie = {
+      imdbID: selectedId,
+      title: movie.Title,
+      year: movie.Year,
+      poster: movie.Poster,
+      imdbRating: Number(movie.imdbRating),
+      runtime: Number(movie.Runtime.split(" ").at(0)),
+      userRating: userRating,
+    };
+    onAddWatched(newWatchedMovie);
+  }
 
   useEffect(
     function () {
@@ -48,7 +67,25 @@ function MovieDetails({ selectedId, onCloseMovieDetails }) {
           </header>
           <section>
             <div className="rating">
-              <StarRating maxRating={10} size={24} />
+              {watched.some((x) => x.imdbID === selectedId) ? (
+                <p>
+                  you rated this movie{" "}
+                  {watched.find((x) => x.imdbID === selectedId).userRating}
+                </p>
+              ) : (
+                <>
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    onSetRating={setUseRating}
+                  />
+                  {userRating && (
+                    <button className="btn-add" onClick={handleAdd}>
+                      + Add to list
+                    </button>
+                  )}
+                </>
+              )}
             </div>
             <p>
               <em>{movie.Plot}</em>
